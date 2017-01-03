@@ -1,0 +1,72 @@
+/** BASIC STYLES **/
+body {
+	background-color: #f5f5f5;
+}
+.mdl-layout__content {
+	padding: 5px;
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+}
+.mdl-layout__content > #data-config-contain {
+	flex: 0 1 30%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+.mdl-layout__content > #graph-contain {
+	flex: 0 1 70%;
+	height: 100%;
+	margin-left: 5px;
+}
+.actions-flex {
+	display: flex;
+	flex-direction: row;
+}
+.actions-flex > .spacer {
+	flex: 1 1 auto;
+}
+
+/** PLOT CONFIG **/
+
+#data-config-contain > .mdl-card {
+	margin: 5px 0;
+	width: 100%;
+}
+#data-config-contain > #graph-config {
+	flex: 0 1 35%;
+	display: flex;
+}
+#config {
+	padding: 0 10px;
+	overflow-y: auto;
+}
+.config-range {
+	width: 50px;
+}
+
+/** DATASETS AND FUNCTIONS **/
+#data-config-contain > #data-table-contain {
+	flex: 0 1 65%;
+}
+#data-table-contain > .mdl-tabs {
+	flex: 1 1 auto;
+}
+#data-table-contain > #data-actions {
+	flex: 0 1 min-content;
+}
+#data-table {
+	margin: 0 auto;
+	overflow: auto;
+	min-width: 100%;
+}
+
+/** GRAPH CARD **/
+
+#graph-contain > #graph {
+	width: 100%;
+	flex: 1 1 auto;
+}
+#graph-contain > .mdl-card__actions {
+	flex: 0 1 min-content;
+}

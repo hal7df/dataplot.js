@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>dataplot.js</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+		<link rel="stylesheet" type="text/css" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/style.css"/>
+		<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+	</head>
+	<body>
+		<!-- Always shows a header, even in smaller screens. -->
+		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		  <header class="mdl-layout__header">
+		    <div class="mdl-layout__header-row">
+		      <!-- Title -->
+		      <span class="mdl-layout-title">dataplot.js</span>
+		      <!-- Add spacer, to align navigation to the right -->
+		      <div class="mdl-layout-spacer"></div>
+		      <!-- Navigation. We hide it in small screens. -->
+		      <nav class="mdl-navigation mdl-layout--large-screen-only">
+		      </nav>
+		    </div>
+		  </header>
+		  <div class="mdl-layout__drawer">
+		    <span class="mdl-layout-title">Projects</span>
+		    <nav class="mdl-navigation">
+		      <a id="add-project" class="mdl-navigation__link" href=""><i class="material-icons">add</i>&nbsp;New project</a>
+		    </nav>
+		  </div>
+		  <main class="mdl-layout__content">
+		    <div id="data-config-contain">
+		    	<div id="graph-config" class="mdl-card mdl-shadow--2dp">
+		    		<div class="mdl-card__title">
+		    			<h2 class="mdl-card__title-text">Plot settings</h2>
+		    		</div>
+		    		<form id="config">
+			    		<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+		    				<input class="graph-config mdl-textfield__input" type="text" id="graph-title"/>
+		    				<label class="mdl-textfield__label" for="graph-title">Plot title</label>
+		    			</div>
+		    			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+		    				<input class="graph-config mdl-textfield__input" type="text" id="graph-ylabel"/>
+		    				<label class="mdl-textfield__label" for="graph-ylabel">Y-axis label</label>
+		    			</div>
+		    			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="autoscale-x">
+		    				<input type="checkbox" id="autoscale-x" class="mdl-checkbox__input" checked/>
+		    				<span class="mdl-checkbox__label">Autoscale X-axis</span>
+		    			</label>
+		    			<span class="config-range mdl-textfield mdl-js-textfield">
+		    				<input id="x-min" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
+		    				<label class="mdl-textfield__label" for="x-min">min</label>
+		    				<span class="mdl-textfield__error">Must be numeric</span>
+		    			</span> to
+		    			<span class="config-range mdl-textfield mdl-js-textfield">
+		    				<input id="x-max" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
+		    				<label class="mdl-textfield__label" for="x-max">max</label>
+		    				<span class="mdl-textfield__error">Must be numeric</span>
+		    			</span>
+		    			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="autoscale-y">
+		    				<input type="checkbox" id="autoscale-y" class="mdl-checkbox__input" checked/>
+		    				<span class="mdl-checkbox__label">Autoscale Y-axis</span>
+		    			</label>
+		    			<span class="config-range mdl-textfield mdl-js-textfield">
+		    				<input id="x-min" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
+		    				<label class="mdl-textfield__label" for="x-min">min</label>
+		    				<span class="mdl-textfield__error">Must be numeric</span>
+		    			</span> to
+		    			<span class="config-range mdl-textfield mdl-js-textfield">
+		    				<input id="x-max" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
+		    				<label class="mdl-textfield__label" for="x-max">max</label>
+		    				<span class="mdl-textfield__error">Must be numeric</span>
+		    			</span>
+		    		</form>
+		    	</div>
+		    	<div id="data-table-contain" class="mdl-card mdl-shadow--2dp">
+		    		<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+		    			<div class="mdl-tabs__tab-bar">
+		    				<a href="#datasets" class="mdl-tabs__tab is-active">Datasets</a>
+		    				<a href="#functions" class="mdl-tabs__tab">Functions</a>
+		    			</div>
+		    			
+		    			<div id="datasets" class="mdl-tabs__panel is-active">
+		    				<table id="data-table" class="mdl-data-table mdl-js-data-table">
+		    					<thead>
+		    						<tr>
+		    							<th id="x-name">x</th>
+		    							<th class="y-name" data-setnum="0">y0</th>
+		    							<th id="add-col">
+		    								<button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">add</i></button>
+		    							</th>
+		    						</tr>
+		    					</thead>
+		    					<tbody>
+		    						<tr>
+		    							<td></td>
+		    							<td></td>
+		    							<td></td>
+		    						</tr>
+		    					</tbody>
+		    				</table>
+		    			</div>
+		    			<div id="functions" class="mdl-tabs__panel">
+		    			</div>
+			    	</div>
+			    	<div id="dataset-actions" class="actions-flex mdl-card__actions mdl-card--border">
+			    		<button id="import" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">file_upload</i></button>
+			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="import">Import datasets from CSV</div>
+			    		<button id="export" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">file_download</i></button>
+			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="export">Export datasets to CSV</div>
+			    		<div class="spacer"></div>
+			    		<button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored mdl-js-ripple-effect">
+			    			<i class="material-icons">done</i>
+			    		</button>
+			    	</div>
+		    	</div>
+		    </div>
+		    <div id="graph-contain" class="mdl-card mdl-shadow--2dp">
+		    	<canvas id="graph">Your browser does not support dataplot.js. Please upgrade your current browser or switch to a different browser.</canvas>
+		    	<div class="mdl-card__actions mdl-card--border">
+		    		<button id="compute-trendline" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">trending_up</i></button>
+		    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="compute-trendline">Compute and plot trendlines</div>
+		    		<button id="optimal-size" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">image_aspect_ratio</i></button>
+		    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="optimal-size">Get plot for use with documents</div>
+		    	</div>
+		    </div>
+		  </main>
+		</div>
+	</body>
+</html>
