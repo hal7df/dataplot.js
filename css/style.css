@@ -70,3 +70,6 @@ body {
 #graph-contain > .mdl-card__actions {
 	flex: 0 1 min-content;
 }
+canvas#graph {
+	image-rendering: pixelated;
+}

@@ -104,10 +104,12 @@ function Matrix (h, w, zero) {
 					if (augment) result.augment._swapRows(i,leadingOne);
 				}
 				
+				//Scale row to get the leading one
 				scaleFactor = (1./result.rref.get(i,i));
 				result.rref._scaleRow(i, scaleFactor);
 				if (augment) result.augment._scaleRow(i, scaleFactor);
 				
+				//Zero out rest of column
 				for (var row = 0; row < result.rref.rows; ++row) {
 					if (row === i) continue;
 					
@@ -202,7 +204,7 @@ function Matrix (h, w, zero) {
 		this.setRow(row1,this.getRow(row2));
 		this.setRow(row2,tmp);
 	};
-};
+}
 
 Matrix.copy = function (matrix) {
 	var clone = new Matrix (matrix.rows, matrix.cols);
