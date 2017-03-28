@@ -87,15 +87,11 @@
 		    					<thead>
 		    						<tr>
 		    							<th id="x-name">x</th>
-		    							<th class="y-name" data-setnum="0">y0</th>
-		    							<th id="add-col">
-		    								<button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">add</i></button>
-		    							</th>
+		    							<th class="noedit" data-setnum="0">y0</th>
 		    						</tr>
 		    					</thead>
 		    					<tbody>
 		    						<tr>
-		    							<td></td>
 		    							<td></td>
 		    							<td></td>
 		    						</tr>
@@ -106,6 +102,8 @@
 		    			</div>
 			    	</div>
 			    	<div id="dataset-actions" class="actions-flex mdl-card__actions mdl-card--border">
+			    		<button id="add-dataset" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">add</i></button>
+			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="add-dataset">Add dataset</div>
 			    		<button id="import" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">file_upload</i></button>
 			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="import">Import datasets from CSV</div>
 			    		<button id="export" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">file_download</i></button>

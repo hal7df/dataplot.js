@@ -192,6 +192,34 @@ function Graph (canvas) {
 	this._calcWindow();
 }
 
+function SaveData (inData) {
+	if (inData.nodeType) {
+		var n = inData.getElementById("graph-title");
+		
+		this._data = {
+			plot: {
+				title: inData.getElementById("graph-title").value,
+				yLabel: inData.getElementById("graph-ylabel").value,
+				xAxis: {
+					autoscale: inData.getElementById("autoscale-x").checked,
+					min: inData.getElementById("x-min").value,
+					max: inData.getElementById("x-max").value
+				},
+				yAxis: {
+					autoscale: inData.getElementById("autoscale-y").checked,
+					min: inData.getElementById("y-min").value,
+					max: inData.getElementById("y-max").value
+				}
+			},
+			data: {
+				x: [],
+				y: []
+			}
+		};
+	}
+	else this._data = inData; 
+}
+
 var graph;
 
 function initGraph () {

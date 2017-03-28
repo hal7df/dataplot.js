@@ -60,6 +60,16 @@ body {
 	overflow: auto;
 	min-width: 100%;
 }
+#data-table td:not(.noedit),
+#data-table th:not(.noedit) {
+	position: relative;
+}
+#data-table td:not(.noedit) > div.dataedit {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
 
 /** GRAPH CARD **/
 
