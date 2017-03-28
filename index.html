@@ -9,6 +9,7 @@
 		<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 		<script async src="js/min/matrix.js"></script>
 		<script defer src="js/dataplot.js"></script>
+		<script defer src="js/page.js"></script>
 	</head>
 	<body>
 		<!-- Always shows a header, even in smaller screens. -->
@@ -38,11 +39,11 @@
 		    		</div>
 		    		<form id="config">
 			    		<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-		    				<input class="graph-config mdl-textfield__input" type="text" id="graph-title"/>
+		    				<input class="graph-config mdl-textfield__input" type="text" id="graph-title" onchange="page.settings.title(event)"/>
 		    				<label class="mdl-textfield__label" for="graph-title">Plot title</label>
 		    			</div>
 		    			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-		    				<input class="graph-config mdl-textfield__input" type="text" id="graph-ylabel"/>
+		    				<input class="graph-config mdl-textfield__input" type="text" id="graph-ylabel" onchange="page.settings.yLabel(event)"/>
 		    				<label class="mdl-textfield__label" for="graph-ylabel">Y-axis label</label>
 		    			</div>
 		    			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="autoscale-x">
@@ -64,13 +65,13 @@
 		    				<span class="mdl-checkbox__label">Autoscale Y-axis</span>
 		    			</label>
 		    			<span class="config-range mdl-textfield mdl-js-textfield">
-		    				<input id="x-min" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
-		    				<label class="mdl-textfield__label" for="x-min">min</label>
+		    				<input id="y-min" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
+		    				<label class="mdl-textfield__label" for="y-min">min</label>
 		    				<span class="mdl-textfield__error">Must be numeric</span>
 		    			</span> to
 		    			<span class="config-range mdl-textfield mdl-js-textfield">
-		    				<input id="x-max" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
-		    				<label class="mdl-textfield__label" for="x-max">max</label>
+		    				<input id="y-max" class="mdl-textfield__input" type="number" pattern="-?[0-9](\.[0-9]+)?" disabled/>
+		    				<label class="mdl-textfield__label" for="y-max">max</label>
 		    				<span class="mdl-textfield__error">Must be numeric</span>
 		    			</span>
 		    		</form>
@@ -86,8 +87,8 @@
 		    				<table id="data-table" class="mdl-data-table mdl-js-data-table">
 		    					<thead>
 		    						<tr>
-		    							<th id="x-name">x</th>
-		    							<th class="noedit" data-setnum="0">y0</th>
+		    							<th style="width: 50%;" id="x-name" contentEditable="true" onblur="page.datasets.xLabel(event)">x</th>
+		    							<th style="width: 50%;" class="noedit" data-setnum="0">y<sub>0</sub></th>
 		    						</tr>
 		    					</thead>
 		    					<tbody>
@@ -109,9 +110,6 @@
 			    		<button id="export" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">file_download</i></button>
 			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="export">Export datasets to CSV</div>
 			    		<div class="spacer"></div>
-			    		<button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored mdl-js-ripple-effect">
-			    			<i class="material-icons">done</i>
-			    		</button>
 			    	</div>
 		    	</div>
 		    </div>

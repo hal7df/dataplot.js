@@ -59,6 +59,7 @@ body {
 	margin: 0 auto;
 	overflow: auto;
 	min-width: 100%;
+	table-layout: fixed;
 }
 #data-table td:not(.noedit),
 #data-table th:not(.noedit) {
