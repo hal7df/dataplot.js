@@ -46,8 +46,8 @@
 		    				<input class="graph-config mdl-textfield__input" type="text" id="graph-ylabel" onchange="page.settings.yLabel(event)"/>
 		    				<label class="mdl-textfield__label" for="graph-ylabel">Y-axis label</label>
 		    			</div>
-		    			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="autoscale-x">
-		    				<input type="checkbox" id="autoscale-x" class="mdl-checkbox__input" checked/>
+		    			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="x-autoscale">
+		    				<input type="checkbox" id="x-autoscale" class="mdl-checkbox__input" onclick="page.settings.autoscale(event)" checked/>
 		    				<span class="mdl-checkbox__label">Autoscale X-axis</span>
 		    			</label>
 		    			<span class="config-range mdl-textfield mdl-js-textfield">
@@ -60,8 +60,8 @@
 		    				<label class="mdl-textfield__label" for="x-max">max</label>
 		    				<span class="mdl-textfield__error">Must be numeric</span>
 		    			</span>
-		    			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="autoscale-y">
-		    				<input type="checkbox" id="autoscale-y" class="mdl-checkbox__input" checked/>
+		    			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="y-autoscale">
+		    				<input type="checkbox" id="y-autoscale" class="mdl-checkbox__input" onclick="page.settings.autoscale(event)" checked/>
 		    				<span class="mdl-checkbox__label">Autoscale Y-axis</span>
 		    			</label>
 		    			<span class="config-range mdl-textfield mdl-js-textfield">
