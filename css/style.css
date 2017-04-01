@@ -57,9 +57,20 @@ body {
 }
 #data-table {
 	margin: 0 auto;
-	overflow: auto;
 	min-width: 100%;
 	table-layout: fixed;
+}
+#data-table > thead,
+#data-table > tbody {
+	display: block;
+	min-width: 100%;
+}
+#data-table > thead > tr,
+#data-table > tbody > tr {
+	min-width: 100%;
+}
+#data-table > tbody {
+	overflow: auto;
 }
 #data-table td:not(.noedit),
 #data-table th:not(.noedit) {
