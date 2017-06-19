@@ -47,14 +47,14 @@ var page = {
 					xAxis: {
 						label: document.getElementById("x-name").textContent,
 						autoscale: inData.elements.namedItem("x-autoscale").checked,
-						min: parseInt(inData.elements.namedItem("x-min").value, 10),
-						max: parseInt(inData.elements.namedItem("x-max").value, 10)
+						min: parseFloat(inData.elements.namedItem("x-min").value, 10),
+						max: parseFloat(inData.elements.namedItem("x-max").value, 10)
 					},
 					yAxis: {
 						label: inData.elements.namedItem("graph-ylabel").value,
 						autoscale: inData.elements.namedItem("y-autoscale").checked,
-						min: parseInt(inData.elements.namedItem("y-min").value, 10),
-						max: parseInt(inData.elements.namedItem("y-max").value, 10)
+						min: parseFloat(inData.elements.namedItem("y-min").value, 10),
+						max: parseFloat(inData.elements.namedItem("y-max").value, 10)
 					}
 				},
 				data: {
@@ -98,6 +98,26 @@ var page = {
 		yLabel: function (event) {
 			event = event || window.event;
 			page._graph.setYLabel(page._data.plot.yAxis.label = event.target.value);
+			page._graph.drawGraph();
+		},
+		changeBounds: function(event){
+			
+			//Because of internet exlorer GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			//Paul "Javascript is a lot like what you would expect, and nothing like what you would expect!!!!!!!!!!!! :)"
+			event = event || window.event;
+
+			if(event.target.id == "x-min"){
+				page._graph.setXWindow(page._data.plot.xAxis.min = parseFloat(event.target.value), page._data.plot.xAxis.max);
+			}
+			else if(event.target.id == "x-max"){
+				page._graph.setXWindow(page._data.plot.xAxis.min, page._data.plot.xAxis.max = parseFloat(event.target.value));
+			}
+			else if(event.target.id=="y-min"){
+				page._graph.setYWindow(page._data.plot.yAxis.min = parseFloat(event.target.value),page._data.plot.yAxis.max);
+			}
+			else if(event.target.id=="y-max"){
+				page._graph.setYWindow(page._data.plot.yAxis.min, page._data.plot.yAxis.max = parseFloat(event.target.value));
+			}
 			page._graph.drawGraph();
 		},
 		autoscale: function (event) {
