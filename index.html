@@ -4,9 +4,9 @@
 		<title>dataplot.js</title>
 		<meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
-		<link rel="stylesheet" type="text/css" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css"/>
+		<link rel="stylesheet" type="text/css" href="mdl/material.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/style.css"/>
-		<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+		<script defer src="mdl/material.min.js"></script>
 		<script async src="js/min/matrix.js"></script>
 		<script defer src="js/dataplot.js"></script>
 		<script defer src="js/page.js"></script>
@@ -76,8 +76,8 @@
 		    			</span>
 		    		</form>
 		    	</div>
-		    	<div id="data-table-contain" class="mdl-card mdl-shadow--2dp">
-		    		<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+		    	<div id="data-src-card" class="mdl-card mdl-shadow--2dp">
+		    		<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect" id="data-table-contain">
 		    			<div class="mdl-tabs__tab-bar">
 		    				<a href="#datasets" class="mdl-tabs__tab is-active">Datasets</a>
 		    				<a href="#functions" class="mdl-tabs__tab">Functions</a>
@@ -103,8 +103,8 @@
 		    			</div>
 			    	</div>
 			    	<div id="dataset-actions" class="actions-flex mdl-card__actions mdl-card--border">
-			    		<button id="add-dataset" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">add</i></button>
-			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="add-dataset">Add dataset</div>
+			    		<!-- <button id="add-dataset" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">add</i></button>
+			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="add-dataset">Add dataset</div>-->
 			    		<button id="insert-pm" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">change_history</i></button>
 			    		<div class="mdl-tooltip mdl-tooltip--top" data-mdl-for="insert-pm">Insert constant uncertainty on column</div>
 			    		<button id="import" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"><i class="material-icons">file_upload</i></button>

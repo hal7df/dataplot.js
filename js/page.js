@@ -28,6 +28,10 @@ var page = {
 		for (var i = 0; i < numPoints; ++i) {
 			ajaxGet("https://raw.githubusercontent.com/hal7df/dataplot.js/beta/img/pt-" + i + ".svg", this._savePointType(i));
 		}
+		
+		page.sizeTable();
+		page._events.throttle("resize", "throttledResize");
+		window.addEventListener("throttledResize", page.sizeTable);
 	},
 	redraw: function () {
 		this._graph.setTitle(this._data.plot.title);
@@ -199,6 +203,53 @@ var page = {
 				row.appendChild(createCell(i));
 			
 			table.appendChild(row);
+		}
+	},
+	sizeTable: function () {
+		var configArea = document.getElementById("data-config-contain");
+		var configCard = configArea.firstElementChild;
+		var dataCard = configArea.lastElementChild;
+		var container = dataCard.firstElementChild;
+		var tools = dataCard.lastElementChild;
+		var tabBar = container.firstElementChild;
+		var table = tabBar.nextElementSibling.firstElementChild;
+		var head = table.firstElementChild;
+		var body = table.lastElementChild;
+		
+		var configAreaHeight = parseInt(getComputedStyle(configArea).height);
+		var configCardHeight = parseInt(getComputedStyle(configCard).height);
+		var cardMargin = parseInt(getComputedStyle(dataCard).marginTop);
+		var toolsHeight = parseInt(getComputedStyle(tools).height);
+		var tabBarHeight = parseInt(getComputedStyle(tabBar).height);
+		var headHeight = parseInt(getComputedStyle(head).height);
+		
+		body.style.height = (configAreaHeight - 
+							(configCardHeight + (4 * cardMargin) + 
+									toolsHeight + tabBarHeight + headHeight))
+							.toString() + "px";
+	},
+	_events: {
+		getCustom: function (name, params) {
+			if (typeof CustomEvent === "function")
+				return new CustomEvent(name,params);
+			else {
+				var evt = document.createEvent(name);
+				evt.initCustomEvent(name, params.bubbles, params.cancelable,
+									params.detail);
+			}
+		},
+		throttle: function (sourceEvent, destEvent, target) {
+			target = target || window;
+			var running = false;
+			var intermediateListener = function () {
+				if (running) return;
+				running = true;
+				requestAnimationFrame(function () {
+					target.dispatchEvent(page._events.getCustom(destEvent));
+					running = false;
+				});
+			}
+			target.addEventListener(sourceEvent, intermediateListener);
 		}
 	},
 	_points: [],
