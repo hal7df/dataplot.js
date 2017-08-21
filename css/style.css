@@ -22,6 +22,7 @@ body {
 .actions-flex {
 	display: flex;
 	flex-direction: row;
+	flex: 0 0 auto;
 }
 .actions-flex > .spacer {
 	flex: 1 1 auto;

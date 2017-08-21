@@ -31,7 +31,7 @@ var page = {
 		
 		page.sizeTable();
 		page._events.throttle("resize", "throttledResize");
-		window.addEventListener("throttledResize", page.sizeTable);
+		window.addEventListener("resize", page.sizeTable);
 	},
 	redraw: function () {
 		this._graph.setTitle(this._data.plot.title);
@@ -206,6 +206,7 @@ var page = {
 		}
 	},
 	sizeTable: function () {
+		var appBar = document.querySelector("header");
 		var configArea = document.getElementById("data-config-contain");
 		var configCard = configArea.firstElementChild;
 		var dataCard = configArea.lastElementChild;
@@ -216,17 +217,28 @@ var page = {
 		var head = table.firstElementChild;
 		var body = table.lastElementChild;
 		
-		var configAreaHeight = parseInt(getComputedStyle(configArea).height);
-		var configCardHeight = parseInt(getComputedStyle(configCard).height);
-		var cardMargin = parseInt(getComputedStyle(dataCard).marginTop);
-		var toolsHeight = parseInt(getComputedStyle(tools).height);
-		var tabBarHeight = parseInt(getComputedStyle(tabBar).height);
-		var headHeight = parseInt(getComputedStyle(head).height);
+		//First, get the content height
+		var tableHeight = Math.max(document.documentElement.clientHeight,
+									window.innerHeight || 0) 
+							- parseFloat(getComputedStyle(appBar).height, 10);
 		
-		body.style.height = (configAreaHeight - 
-							(configCardHeight + (4 * cardMargin) + 
-									toolsHeight + tabBarHeight + headHeight))
-							.toString() + "px";
+		//Subtract the settings card height
+		tableHeight -= parseFloat(getComputedStyle(configCard).height, 10);
+		
+		//Subtract the contents of the data card (except the table height)
+		tableHeight -= parseFloat(getComputedStyle(tabBar).height, 10);
+		tableHeight -= parseFloat(getComputedStyle(head).height, 10);
+		tableHeight -= parseFloat(getComputedStyle(tools).height, 10);
+		
+		//Subtract whitespace
+		//Subtract vertical margins on the cards
+		tableHeight -= 4*parseFloat(getComputedStyle(dataCard).marginTop)
+		
+		//Subtract padding on main element
+		tableHeight -= 2*parseFloat(getComputedStyle(document.querySelector("main")).padding, 10);
+		
+		body.style.height = tableHeight.toString() + "px";
+		console.log(body.style.height);
 	},
 	_events: {
 		getCustom: function (name, params) {
