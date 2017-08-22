@@ -22,7 +22,7 @@ function Matrix (h, w, zero) {
 	
 	this.rows = h;
 	this.cols = w;
-	this.data = new Array();
+	this.data = [];
 	
 	for (var i = 0; i < h; ++i) {
 		this.data.push(new Array(w));

@@ -258,7 +258,6 @@ var page = {
 		tableHeight -= 2*parseFloat(getComputedStyle(document.querySelector("main")).padding, 10);
 		
 		body.style.height = tableHeight.toString() + "px";
-		console.log(body.style.height);
 	},
 	_events: {
 		getCustom: function (name, params) {
