@@ -20,6 +20,12 @@ function Matrix (h, w, zero) {
 	w = w === undefined ? 1 : w;
 	zero = zero === undefined ? false : zero;
 	
+	var epsilonEquals = function (a, b, factor) {
+		factor = factor === undefined ? 100 : factor
+		var epsilon = (Number.EPSILON || Math.pow(2, -52)) * factor;
+		return (Math.abs(a - b) < epsilon);
+	}
+	
 	this.rows = h;
 	this.cols = w;
 	this.data = [];
@@ -76,14 +82,14 @@ function Matrix (h, w, zero) {
 		return column;
 	};
 	this.print = function () {
-		console.table(this.data);
+		console.log(this.data);
 	};
 	this.equals = function (other) {
 		if (other.rows !== this.rows || other.cols !== this.cols) return false;
 		
 		for (var row = 0; row < this.rows; ++row) {
 			for (var col = 0; col < this.cols; ++col) {
-				if (this.get(row,col) !== other.get(row,col)) return false;
+				if (!epsilonEquals(this.get(row,col), other.get(row,col))) return false;
 			}
 		}
 		
@@ -98,8 +104,7 @@ function Matrix (h, w, zero) {
 				"augment":(augment !== undefined) ? Matrix.copy(augment) : augment
 		};
 		
-		var diagLength = (result.rref.rows < result.rref.cols) ?
-											result.rref.rows : result.rref.cols;
+		var diagLength = Math.min(result.rref.rows, result.rref.cols);
 		var scaleFactor;
 		
 		//Loop over diagonal entries
@@ -107,7 +112,7 @@ function Matrix (h, w, zero) {
 			//Find the leading one for this diagonal index
 			var leadingOne = i;
 			
-			while (leadingOne < diagLength && result.rref.get(leadingOne,i) === 0)
+			while (leadingOne < diagLength && epsilonEquals(result.rref.get(leadingOne,i), 0))
 				++leadingOne;
 			
 			//A leading one was found, continue with elimination

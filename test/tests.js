@@ -180,4 +180,53 @@ QUnit.test("Set column values", function (assert) {
 	assert.throws(function () { m.setCol(10, col); }, RangeError, "Bounds test 2");
 	assert.throws(function () { m.setCol(3, "Hello"); }, TypeError, "Type test");
 	assert.throws(function () { m.setCol(4, []); }, RangeError, "Length test");
-})
+});
+
+QUnit.test("Equality", function (assert) {
+	var m1 = new Matrix (5, 5);
+	var m1clone = new Matrix (5, 5);
+	var m2 = new Matrix (5, 5);
+	var m3 = new Matrix (5, 3);
+	var m4 = new Matrix (3, 5);
+	var m5 = new Matrix (3, 3);
+	var base = [0, 1, 2, 3, 4];
+	var adder = function (delta) {
+		return function (x) { return x + delta; };
+	};
+	
+	for (var i = 0; i < 5; ++i) {
+		m1.setRow(i, base.map(adder(i * 5)));
+		m1clone.setRow(i, base.map(adder(i * 5)));
+		m2.setCol(i, base.map(adder(i * 5)));
+		
+		if (i < 3) {
+			m3.setCol(i, base.map(adder(i * 5)));
+			m4.setRow(i, base.map(adder(i * 5)));
+			m5.setRow(i, base.map(adder(i * 5)).splice(2));
+		}
+	}
+	
+	assert.ok(m1.equals(m1clone), "Equal matrices");
+	assert.notOk(m1.equals(m2), "Unequal matrices of congruent dimensions");
+	assert.notOk(m1.equals(m3), "Unequal matrices of unequal width");
+	assert.notOk(m1.equals(m4), "Unequal matrices of unequal height");
+	assert.notOk(m1.equals(m5), "Unequal matrices of unequal dimensions");
+});
+
+QUnit.test("Row reduction", function (assert) {
+	var m1 = new Matrix (5, 5);
+	var rref1 = new Matrix (5, 5, true);
+	var testResult;
+	var base = [0, 1, 2, 3, 4];
+	var adder = function (delta) {
+		return function (x) { return x + delta; };
+	};
+	
+	for (var i = 0; i < 5; ++i) m1.setRow(i, base.map(adder(i * 5)));
+	
+	rref1.setRow(0, [1, 0, -1, -2, -3]);
+	rref1.setRow(1, [0, 1, 2, 3, 4]);
+	
+	testResult = m1.rref();
+	assert.ok(rref1.equals(testResult.rref), "RREF #1";
+});
