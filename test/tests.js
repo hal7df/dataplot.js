@@ -214,19 +214,176 @@ QUnit.test("Equality", function (assert) {
 });
 
 QUnit.test("Row reduction", function (assert) {
-	var m1 = new Matrix (5, 5);
-	var rref1 = new Matrix (5, 5, true);
+	var m = new Matrix (5, 5);
+	var m2 = new Matrix (3, 3);
+	var m3 = new Matrix (5, 5);
+	var rref = new Matrix (5, 5, true);
 	var testResult;
 	var base = [0, 1, 2, 3, 4];
 	var adder = function (delta) {
 		return function (x) { return x + delta; };
 	};
 	
-	for (var i = 0; i < 5; ++i) m1.setRow(i, base.map(adder(i * 5)));
 	
-	rref1.setRow(0, [1, 0, -1, -2, -3]);
-	rref1.setRow(1, [0, 1, 2, 3, 4]);
+	for (var i = 0; i < 5; ++i) m.setRow(i, base.map(adder(i * 5)));
+	rref.setRow(0, [1, 0, -1, -2, -3]);
+	rref.setRow(1, [0, 1, 2, 3, 4]);
 	
-	testResult = m1.rref();
-	assert.ok(rref1.equals(testResult.rref), "RREF #1";
+	testResult = m.rref();
+	assert.ok(testResult.rref.equals(rref), "Square RREF #1");
+
+	m = new Matrix (3, 3);
+	m.setRow(0, [0, 19, 3]);
+	m.setRow(1, [13, 15, 7]);
+	m.setRow(2, [4, 19, 16]);
+
+	testResult = m.rref(Matrix.colFromArray([8, 7, 13]));
+	assert.ok(testResult.rref.equals(Matrix.identity(3)), "Square RREF #2");
+	assert.ok(testResult.augment.equals(Matrix.colFromArray([-(271/2859),
+	                                                         (339/953),
+	                                                         (1183/2859)])),
+    														"Square augment #2");
+
+	m = new Matrix (5, 5);
+	m.setRow(0, [17, 24, 1, 8, 15]);
+	m.setRow(1, [23, 5, 7, 14, 16]);
+	m.setRow(2, [4, 6, 13, 20, 22]);
+	m.setRow(3, [10, 12, 19, 21, 3]);
+	m.setRow(4, [11, 18, 25, 2, 9]);
+	
+	testResult = m.rref(Matrix.colFromArray([4, 5, 6, 5, 5]));
+	assert.ok(testResult.rref.equals(Matrix.identity(5)), "Square RREF #3");
+	assert.ok(testResult.augment.equals(Matrix.colFromArray([(29/624), (7/240),
+	                                                         (43/390), (259/3120),
+	                                                         (361/3120)])),
+															"Square augment #3");
+	
+	m = new Matrix (3, 5);
+	m.setRow(0, [6, 9, 7, 2, 9]);
+	m.setRow(1, [7, 1, 1, 8, 5]);
+	m.setRow(2, [9, 2, 5, 5, 8]);
+	
+	rref = new Matrix (3, 5, true)
+	for (var i = 0; i < 3; ++i) rref.set(i, i, 1);
+	rref.setCol(3, [(232/181), (101/181), -(277/181)]);
+	rref.setCol(4, [(112/181), (55/181), (66/181)]);
+	
+	testResult = m.rref(Matrix.colFromArray([7, 5, 4]));
+	assert.ok(testResult.rref.equals(rref), "Underdetermined RREF #1");
+	assert.ok(testResult.augment.equals(Matrix.colFromArray([(126/181),
+	                                                         (175/181),
+	                                                         -(152/181)])),
+	                                                         "Underdetermined augment #1");
+	
+	m = new Matrix (3, 5);
+	m.setRow(0, [8, 0, 9, 8, 5]);
+	m.setRow(1, [9, 3, 1, 1, 2]);
+	m.setRow(2, m.getRow(0).map(function (x) { return x * 2; }));
+	
+	rref = new Matrix (3, 5, true);
+	for (var i = 0; i < 2; ++i) rref.set(i, i, 1);
+	rref.setCol(2, [(9/8), -(73/24), 0]);
+	rref.setCol(3, [1, -(8/3), 0]);
+	rref.setCol(4, [(5/8), -(29/24), 0]);
+	
+	testResult = m.rref(Matrix.colFromArray([5, 7, 8]));
+	assert.ok(testResult.rref.equals(rref), "Underdetermined RREF #2");
+	
+	m = new Matrix (5, 3);
+	m.setRow(0, [0, 1, 2]);
+	m.setRow(1, [1, 2, 3]);
+	m.setRow(2, [0, 2, 4]);
+	m.setRow(3, [5, 7, 6]);
+	m.setRow(4, [4, 10, 8]);
+	
+	rref = new Matrix (5, 3, true);
+	for (var i = 0; i < 3; ++i) rref.set(i, i, 1);
+	
+	testResult = m.rref();
+	assert.ok(testResult.rref.equals(rref), "Overdetermined RREF #1");
+	
+	assert.throws(function () { m.rref(Matrix.colFromArray([])); },
+				  RangeError, "Augment dimension checking");
+});
+
+QUnit.test("Transpose", function (assert) {
+	var m = new Matrix (5, 5);
+	var t = new Matrix (5, 5);
+	
+	m.setRow(0, [17, 24, 1, 8, 15]);
+	m.setRow(1, [23, 5, 7, 14, 16]);
+	m.setRow(2, [4, 6, 13, 20, 22]);
+	m.setRow(3, [10, 12, 19, 21, 3]);
+	m.setRow(4, [11, 18, 25, 2, 9]);
+	
+	t.setRow(0, [17, 23, 4, 10, 11]);
+	t.setRow(1, [24, 5, 6, 12, 18]);
+	t.setRow(2, [1, 7, 13, 19, 25]);
+	t.setRow(3, [8, 14, 20, 21, 2]);
+	t.setRow(4, [15, 16, 22, 3, 9]);
+	
+	assert.ok(m.transpose().equals(t), "Magic 5x5 transpose");
+	
+	m = new Matrix (3, 5);
+	t = new Matrix (5, 3);
+
+	m.setRow(0, [6, 9, 7, 2, 9]);
+	m.setRow(1, [7, 1, 1, 8, 5]);
+	m.setRow(2, [9, 2, 5, 5, 8]);
+	
+	t.setRow(0, [6, 7, 9]);
+	t.setRow(1, [9, 1, 2]);
+	t.setRow(2, [7, 1, 5]);
+	t.setRow(3, [2, 8, 5]);
+	t.setRow(4, [9, 5, 8]);
+	
+	assert.ok(m.transpose().equals(t), "3x5 transpose");
+	
+	m = new Matrix (5, 3);
+	t = new Matrix (3, 5);
+
+	m.setRow(0, [0, 1, 2]);
+	m.setRow(1, [1, 2, 3]);
+	m.setRow(2, [0, 2, 4]);
+	m.setRow(3, [5, 7, 6]);
+	m.setRow(4, [4, 10, 8]);
+	
+	t.setRow(0, [0, 1, 0, 5, 4]);
+	t.setRow(1, [1, 2, 2, 7, 10]);
+	t.setRow(2, [2, 3, 4, 6, 8]);
+	
+	assert.ok(m.transpose().equals(t), "5x3 transpose")
+});
+
+QUnit.test("Inverse", function (assert) {
+	var m = new Matrix (5, 5);
+	var inv = new Matrix (5, 5);
+
+	m.setRow(0, [17, 24, 1, 8, 15]);
+	m.setRow(1, [23, 5, 7, 14, 16]);
+	m.setRow(2, [4, 6, 13, 20, 22]);
+	m.setRow(3, [10, 12, 19, 21, 3]);
+	m.setRow(4, [11, 18, 25, 2, 9]);
+	
+	inv.setRow(0, [-(77/15600), (133/2600), -(23/650), (3/2600), (53/15600)]);
+	inv.setRow(1, [(673/15600), -(97/2600), -(3/650), (33/2600), (23/15600)]);
+	inv.setRow(2, [-(59/1950), (1/325), (1/325), (1/325), (71/1950)]);
+	inv.setRow(3, [(73/15600), -(17/2600), (7/650), (113/2600), -(55/1487)]);
+	inv.setRow(4, [(43/15600), (1/200), (27/650), -(9/200), (173/15600)]);
+	
+	assert.ok(m.inverse().equals(inv, 1e10), "Magic 5x5 inverse");
+	
+	m.setRow(0, [0, 5, 3, 5, 9]);
+	m.setRow(1, [1, 2, 2, 8, 9]);
+	m.setRow(2, [8, 5, 4, 8, 5]);
+	m.setRow(3, [9, 3, 0, 5, 8]);
+	m.setRow(4, [5, 6, 8, 2, 8]);
+	
+	inv.setRow(0, [-(587/6033), -(5/403), (168/12251), (281/3422), (401/12251)]);
+	inv.setRow(1, [(1169/3418), -(853/2856), (309/2584), -(5/494), -(50/441)]);
+	inv.setRow(2, [-(337/1826), (994/7227), (72/12251), -(420/3901), (687/4379)]);
+	inv.setRow(3, [-(1/49), (360/4253), (437/3736), -(212/2889), -(391/5431)]);
+	inv.setRow(4, [-(74/12251), (895/12251), -(613/4596), (13/158), (621/12251)]);
+	
+	assert.ok(m.inverse().equals(inv, 1e10), "Invertible 5x5 #2");
 });

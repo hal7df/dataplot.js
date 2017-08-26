@@ -84,12 +84,14 @@ function Matrix (h, w, zero) {
 	this.print = function () {
 		console.log(this.data);
 	};
-	this.equals = function (other) {
+	this.equals = function (other, epsilonFactor) {
+		epsilonFactor = epsilonFactor === undefined ? 100 : epsilonFactor
 		if (other.rows !== this.rows || other.cols !== this.cols) return false;
 		
 		for (var row = 0; row < this.rows; ++row) {
 			for (var col = 0; col < this.cols; ++col) {
-				if (!epsilonEquals(this.get(row,col), other.get(row,col))) return false;
+				if (!epsilonEquals(this.get(row,col), other.get(row,col), epsilonFactor))
+					return false;
 			}
 		}
 		
@@ -124,9 +126,9 @@ function Matrix (h, w, zero) {
 				}
 				
 				//Scale row to get the leading one
-				scaleFactor = (1./result.rref.get(i,i));
-				result.rref._scaleRow(i, scaleFactor);
-				if (augment) result.augment._scaleRow(i, scaleFactor);
+				var scaleFactor = result.rref.get(i,i);
+				result.rref._divideRow(i, scaleFactor);
+				if (augment) result.augment._divideRow(i, scaleFactor);
 				
 				//Zero out rest of column
 				for (var row = 0; row < result.rref.rows; ++row) {
@@ -149,7 +151,7 @@ function Matrix (h, w, zero) {
 		var transMatrx = new Matrix (this.cols, this.rows);
 		
 		for (var row = 0; row < this.rows; ++row) {
-			transMatrx.setCol(row, this.getRow());
+			transMatrx.setCol(row, this.getRow(row));
 		}
 		
 		return transMatrx;
@@ -170,8 +172,9 @@ function Matrix (h, w, zero) {
 		var scaled = new Matrix (this.rows, this.cols);
 		
 		for (var row = 0; row < this.rows; ++row) {
-			for (var col = 0; col < this.cols; ++col)
-				scaled.set(row, col, this.get(row, col) * scaleFactor);
+			scaled.setRow(row, this.getRow(row).map(function (x) {
+				return x * scaleFactor; 
+			}));
 		}
 	};
 	this.multiply = function (other) {
@@ -203,9 +206,18 @@ function Matrix (h, w, zero) {
 	}
 	this._scaleRow = function (row, scaleFactor) {
 		this._checkRow(row);
-		for (var col = 0; col < this.cols; ++col)
-			this.data[row][col] *= scaleFactor;
+		
+		this.data[row] = this.data[row].map(function (x) {
+			return x * scaleFactor; 
+		});
 	};
+	this._divideRow = function (row, divisor) {
+		this._checkRow(row);
+		
+		this.data[row] = this.data[row].map(function (x) {
+			return x / divisor;
+		});
+	}
 	this._addRow = function (row, added, scaleFactor) {
 		this._checkRow(row);
 		if (added.length !== this.cols)
