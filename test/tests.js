@@ -439,7 +439,7 @@ QUnit.test("Transpose", function (assert) {
     assert.ok(m.transpose().equals(t), "5x3 transpose")
 });
 
-QUnit.test("Inverse", unction (assert) {
+QUnit.test("Inverse", function (assert) {
        var m = new Matrix(5, 5);
        var inv = new Matrix(5, 5);
 
