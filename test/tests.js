@@ -386,4 +386,245 @@ QUnit.test("Inverse", function (assert) {
 	inv.setRow(4, [-(74/12251), (895/12251), -(613/4596), (13/158), (621/12251)]);
 	
 	assert.ok(m.inverse().equals(inv, 1e10), "Invertible 5x5 #2");
+	
+	var adder = function (delta) {
+		return function (x) { return x + delta; };
+	};
+	var base = [0, 1, 2, 3, 4];
+	
+	for (var i = 0; i < 5; ++i) m.setRow(i, base.map(adder(i * 5)));
+	assert.throws(function () { m.inverse() }, Error,
+			 	  "Non-invertible square matrix");
+	
+	m = new Matrix (5, 3, true);
+	assert.throws(function () { m.inverse() }, RangeError, "Tall matrix");
+	
+	m = new Matrix (3, 5, true);
+	assert.throws(function () { m.inverse() }, RangeError, "Short matrix");
+});
+
+QUnit.test("Scale", function (assert) {
+	var m = new Matrix (5, 5);
+	var result = new Matrix (5, 5);
+	var multiply = function (multiplier) {
+		return function (x) { return x * multiplier; };
+	};
+	
+	m.setRow(0, [3, 3, 3, 8, 0]);
+	m.setRow(1, [0, 2, 8, 7, 9]);
+	m.setRow(2, [9, 9, 1, 0, 4]);
+	m.setRow(3, [9, 8, 8, 4, 3]);
+	m.setRow(4, [8, 0, 6, 4, 9]);
+	
+	for (var i = 0; i < 5; ++i)
+		result.setRow(i, m.getRow(i).map(multiply(5)));
+	
+	assert.ok(m.scale(5).equals(result), "5x5 scale factor 5");
+	
+	for (var i = 0; i < 5; ++i)
+		result.setRow(i, m.getRow(i).map(multiply(4.2)));
+	
+	assert.ok(m.scale(4.2).equals(result), "5x5 scale factor 4.2");
+	
+	m = new Matrix (5, 3);
+	result = new Matrix (5, 3);
+	
+	m.setRow(0, [7, 6, -9]);
+	m.setRow(1, [-9, -10, -2]);
+	m.setRow(2, [-7, -5, -6]);
+	m.setRow(3, [0, 7, 4]);
+	m.setRow(4, [-5, 2, 0]);
+	
+	for (var i = 0; i < 5; ++i)
+		result.setRow(i, m.getRow(i).map(multiply(3.9)));
+	
+	assert.ok(m.scale(3.9).equals(result), "5x3 scale factor 3.9");
+	
+	for (var i = 0; i < 5; ++i)
+		result.setRow(i, m.getRow(i).map(multiply(0.7529)));
+	
+	assert.ok(m.scale(0.7529).equals(result), "5x3 scale factor 0.7529");
+	
+	m = new Matrix (3, 5);
+	result = new Matrix (3, 5);
+	
+	m.setRow(0, [-7, 9, 4, 3, 0]);
+	m.setRow(1, [-4, -4, -9, 1, 9]);
+	m.setRow(2, [-6, -1, 2, 0, -2]);
+	
+	for (var i = 0; i < 3; ++i)
+		result.setRow(i, m.getRow(i).map(multiply(19.503)));
+	
+	assert.ok(m.scale(19.503).equals(result), "3x5 scale factor 19.503");
+	
+	for (var i = 0; i < 3; ++i)
+		result.setRow(i, m.getRow(i).map(multiply(-1.9216)));
+	
+	assert.ok(m.scale(-1.9216).equals(result), "3x5 scale factor -1.9216");
+});
+
+QUnit.test("Multiplication", function (assert) {
+	var m1 = new Matrix (3, 3);
+	var m2 = new Matrix (3, 3);
+	var result = new Matrix (3, 3);
+	
+	m1.setRow(0, [3, 3, 8]);
+	m1.setRow(1, [3, 6, 3]);
+	m1.setRow(2, [1, 8, 8]);
+	
+	m2.setRow(0, [9, 1, 2]);
+	m2.setRow(1, [8, 5, 4]);
+	m2.setRow(2, [1, 7, 1]);
+	
+	result.setRow(0, [59, 74, 26]);
+	result.setRow(1, [78, 54, 33]);
+	result.setRow(2, [81, 97, 42]);
+	
+	assert.ok(m1.multiply(m2).equals(result), "[3x3] times [3x3]");
+	
+	result.setRow(0, [32, 49, 91]);
+	result.setRow(1, [43, 86, 111]);
+	result.setRow(2, [25, 53, 37]);
+	
+	assert.ok(m2.multiply(m1).equals(result), "[3x3] times [3x3] (reverse)");
+	assert.ok(m1.multiply(Matrix.identity(3)).equals(m1),
+			  "[3x3] times [3x3] identity");
+	
+	m1 = new Matrix (3, 5);
+	m2 = new Matrix (5, 3);
+	result = new Matrix (3, 3);
+	
+	m1.setRow(0, [-4, 9, -9, 1, 7]);
+	m1.setRow(1, [5, -10, -1, 8, 2]);
+	m1.setRow(2, [3, 6, 8, -6, 8]);
+	
+	m2.setRow(0, [-10, 1, 2]);
+	m2.setRow(1, [8, -5, 9]);
+	m2.setRow(2, [4, -1, -6]);
+	m2.setRow(3, [3, 8, -9]);
+	m2.setRow(4, [0, 0, -5]);
+	
+	result.setRow(0, [79, -32, 83]);
+	result.setRow(1, [-110, 120, -156]);
+	result.setRow(2, [32, -83, 26]);
+	
+	assert.ok(m1.multiply(m2).equals(result), "[3x5] times [5x3]");
+	
+	result = new Matrix (5, 5);
+	
+	result.setRow(0, [51, -88, 105, -14, -52]);
+	result.setRow(1, [-30, 176, 5, -86, 118]);
+	result.setRow(2, [-39, 10, -83, 32, -22]);
+	result.setRow(3, [1, -107, -107, 121, -35]);
+	result.setRow(4, [-15, -30, -40, 30, -40]);
+	
+	assert.ok(m2.multiply(m1).equals(result), "[5x3] times [3x5]");
+	assert.ok(m1.multiply(Matrix.identity(5)).equals(m1),
+			  "[3x5] times [5x5] identity");
+	assert.ok(m2.multiply(Matrix.identity(3)).equals(m2),
+			  "[5x3] times [3x3] identity");
+	assert.throws(function () { m2.multiply(result); }, RangeError,
+				  "Multiplication dimension checking");
+	
+	m1 = new Matrix (1,1);
+	m1.set(0, 0, 8);
+	
+	assert.throws(function () { m1.multiply(m2); }, RangeError,
+				  "Multiplication dimension checking (with 1x1 on left)");
+	assert.throws(function () { m2.multiply(m1); }, RangeError,
+				  "Multiplication dimension checking (with 1x1 on right)");
+	assert.throws(function () { m2.multiply(8); }, TypeError,
+				  "Scalar multiplication check");
+	assert.throws(function () { m1.multiply(8); }, TypeError,
+				  "Scalar multiplication check (with 1x1 matrix)");
+	
+	m2 = new Matrix (1, 1);
+	m2.set(0, 0, 7);
+	result = new Matrix (1, 1);
+	result.set(0, 0, 56);
+	
+	assert.ok(m1.multiply(m2).equals(result), "[1x1] times [1x1]");
+	assert.ok(m2.multiply(m1).equals(result), "[1x1] times [1x1] (reversed)");
+});
+
+QUnit.test("Copy", function (assert) {
+	var m = new Matrix (3, 3);
+
+	m.setRow(0, [3, 3, 8]);
+	m.setRow(1, [3, 6, 3]);
+	m.setRow(2, [1, 8, 8]);
+	assert.ok(Matrix.copy(m).equals(m), "[3x3] clone");
+	
+	m = new Matrix (3, 5);
+	m.setRow(0, [-4, 9, -9, 1, 7]);
+	m.setRow(1, [5, -10, -1, 8, 2]);
+	m.setRow(2, [3, 6, 8, -6, 8]);
+	assert.ok(Matrix.copy(m).equals(m), "[3x5] clone");
+	
+	m = new Matrix (5, 3);
+	m.setRow(0, [-10, 1, 2]);
+	m.setRow(1, [8, -5, 9]);
+	m.setRow(2, [4, -1, -6]);
+	m.setRow(3, [3, 8, -9]);
+	m.setRow(4, [0, 0, -5]);
+	assert.ok(Matrix.copy(m).equals(m), "[5x3] clone");
+});
+
+QUnit.test("Column vector (as Matrix) from array", function (assert) {
+	var m = new Matrix (5, 1);
+	var check = Matrix.colFromArray([0, 1, 2, 3, 4]);
+	
+	for (var i = 0; i < 5; ++i) m.set(i, 0, i);
+	
+	assert.ok(check.equals(m), "Basic [5x1] check");
+});
+
+QUnit.test("Row vector (as Matrix) from array", function (assert) {
+	var m = new Matrix (1, 5);
+	var check = Matrix.rowFromArray([0, 1, 2, 3, 4]);
+	
+	for (var i = 0; i < 5; ++i) m.set(0, i, i);
+	
+	assert.ok(check.equals(m), "Basic [1x5] check");
+});
+
+QUnit.test("Dot product", function (assert) {
+	var vec1 = [3, -6, 0, 9, 0];
+	var vec2 = [8, -3, -3, -10, -5];
+	
+	assert.equal(Matrix.dot(vec1, vec2), -48, "Dot product #1");
+	assert.equal(Matrix.dot(vec2, vec1), -48, "Dot product #1 (reversed)");
+	
+	vec1 = [-4, -10, -2, 2, -5];
+	vec2 = [3, 1, 4, 3, -2];
+	
+	assert.equal(Matrix.dot(vec1, vec2), -14, "Dot product #2");
+	
+	vec1 = [-5, -4, 9, 4, 2];
+	vec2 = [5, 9, 5, 5, 6];
+	
+	assert.equal(Matrix.dot(vec1, vec2), 16, "Dot product #3");
+	
+	vec2 = [0, 0, 0];
+	
+	assert.throws(function () { Matrix.dot(vec1, vec2); }, RangeError,
+				  "Dot product dimension check #1");
+	assert.throws(function () { Matrix.dot(vec2, vec1); }, RangeError,
+				  "Dot product dimension check #2");
+});
+
+QUnit.test("Identity", function (assert) {
+	var eye, check;
+	
+	for (var w = 0; w < 10; ++w) {
+		eye = new Matrix(w + 1, w + 1, true);
+		check = Matrix.identity(w + 1);
+		
+		for (var i = 0; i < (w + 1); ++i) eye.set(i, i, 1);
+		
+		assert.ok(check.equals(eye),
+				  '[' + (w + 1) + 'x' + (w + 1) + "] identity");
+		assert.ok(check.inverse().equals(eye),
+				  '[' + (w + 1) + 'x' + (w + 1) + "] identity inverse");
+	}
 });

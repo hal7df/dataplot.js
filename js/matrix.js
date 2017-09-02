@@ -159,7 +159,8 @@ function Matrix (h, w, zero) {
 	this.inverse = function () {
 		if (this.rows !== this.cols) throw new RangeError("Matrix not square");
 		
-		if (this.rows === 1 && this.cols === 1) return (1./this.get(0,0));
+		if (this.rows === 1 && this.cols === 1)
+			return Matrix.rowFromArray([(1./this.get(0,0))]);
 		else {
 			var eye = Matrix.identity(this.rows);
 			var rrefData = this.rref(eye);
@@ -176,9 +177,12 @@ function Matrix (h, w, zero) {
 				return x * scaleFactor; 
 			}));
 		}
+		
+		return scaled;
 	};
 	this.multiply = function (other) {
-		if (other.cols === 1 && other.rows === 1) return this.scale(other.get(0,0));
+		if (typeof other === "number")
+			throw new TypeError ("Use Matrix.scale for scalar multiplication");
 		else if (this.cols !== other.rows)
 			throw new RangeError ("Dimension mismatch");
 		
@@ -257,11 +261,9 @@ Matrix.dot = function (vec1, vec2) {
 	if (vec1.length !== vec2.length)
 		throw new RangeError ("Input vectors of unequal lengths");
 	
-	var result;
-	
-	for (var i = 0; i < vec1.length; ++i) result += vec1[i] * vec2[i];
-	
-	return result;
+	return (vec1.reduce(function (sum, value, i) {
+		return sum += value * vec2[i];
+	}, 0));
 };
 Matrix.identity = function (w) {
 	var eye = new Matrix(w,w,true);
