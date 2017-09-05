@@ -122,16 +122,21 @@ var page = {
 		},
 		autoscale: function (event) {
 			event = event || window.event
-			var min = event.target.parentElement.nextElementSibling.firstElementChild;
-			var max = min.parentElement.nextElementSibling.firstElementChild;
+			var min = event.target.parentElement.nextElementSibling;
+			var max = min.nextElementSibling;
 			var axis = page._data.plot[event.target.id.split('-')[0] === 'x' ? "xAxis" : "yAxis"];
 			
-			min.disabled = event.target.checked;
-			max.disabled = event.target.checked;
-			
 			if (event.target.checked) {
-				axis.min = parseInt(min.value = "", 10);
-				axis.max = parseInt(max.value = "", 10);
+			    min.MaterialTextfield.disable();
+			    max.MaterialTextfield.disable();
+			    
+                min.MaterialTextfield.change("");
+                max.MaterialTextfield.change("");
+            
+                //Run graph autoscale logic
+			} else {
+			    min.MaterialTextfield.enable();
+			    max.MaterialTextfield.enable();
 			}
 		}
 	},

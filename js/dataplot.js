@@ -192,13 +192,15 @@ function Graph (canvas) {
 		return preferredInterval || smallestInterval;
 	};
 	this._x = function (x) {
-		if (x >= this._window.x.min && x <= this._window.x.max)
-			return this.plotArea.x.min + (x * (this.plotArea.width()/this._window.width()));
+		if (x >= this._window.x.min && x <= this._window.x.max) {
+			return this.plotArea.x.min + ((x - this._window.x.min) * (this.plotArea.width()/this._window.width()));
+	    }
 		else return -1;
 	};
 	this._y = function (y) {
-		if (y >= this._window.y.min && y <= this._window.y.max)
-			return this.plotArea.y.max - (y * (this.plotArea.height()/this._window.height()));
+		if (y >= this._window.y.min && y <= this._window.y.max) {
+			return this.plotArea.y.max - ((y - this._window.y.min) * (this.plotArea.height()/this._window.height()));
+		}
 		else return -1;
 	}
 	
