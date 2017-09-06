@@ -133,7 +133,7 @@ var page = {
                 min.MaterialTextfield.change("");
                 max.MaterialTextfield.change("");
             
-                //Run graph autoscale logic
+                //TODO: Run graph autoscale logic
 			} else {
 			    min.MaterialTextfield.enable();
 			    max.MaterialTextfield.enable();
@@ -179,9 +179,6 @@ var page = {
 			var row = parseInt(event.target.parentElement.dataset.rownum, 10);
 			var data = page._data.data;
 			var dataNeeded = event.target.parentElement.dataset.needed;
-			var yTest = function (arr) {
-				return !(arr[row] === null || arr[row] === undefined);
-			};
 			
 			if (event.target.classList.contains('x')) {
 				if (event.target.textContent.length > 0) {
@@ -215,8 +212,8 @@ var page = {
 			var createCell = function (colnum) {
 				var cell = document.createElement("td");
 				cell.contentEditable = "true";
-				cell.onblur = page.datasets.update;
-				cell.onkeydown = page.datasets.mask;
+				cell.addEventListener("input", page.datasets.update);
+				cell.addEventListener("keydown", page.datasets.mask);
 				cell.classList.add(colnum === undefined ? "x" : "y");
 				if (colnum !== undefined) cell.dataset.setnum = colnum;
 				return cell;
