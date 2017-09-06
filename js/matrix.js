@@ -127,8 +127,17 @@ function Matrix (h, w, zero) {
 				
 				//Scale row to get the leading one
 				var scaleFactor = result.rref.get(i,i);
-				result.rref._divideRow(i, scaleFactor);
-				if (augment) result.augment._divideRow(i, scaleFactor);
+				
+				//Determine whether division or multiplication by inverse
+				//will preserve the most digits
+				if (Math.abs(scaleFactor) >= 1) {
+    				result.rref._divideRow(i, scaleFactor);
+    				if (augment) result.augment._divideRow(i, scaleFactor);
+				} else {
+				    scaleFactor = 1./scaleFactor;
+				    result.rref._scaleRow(i, scaleFactor);
+				    if (augment) result.augment._scaleRow(i, scaleFactor)
+				}
 				
 				//Zero out rest of column
 				for (var row = 0; row < result.rref.rows; ++row) {
