@@ -238,27 +238,39 @@ var page = {
 		var table = tabBar.nextElementSibling.firstElementChild;
 		var head = table.firstElementChild;
 		var body = table.lastElementChild;
+                var dataStyle = getComputedStyle(dataCard);
+                var mainStyle = getComputedStyle(document.querySelector("main"));
+                var parse = function (x) {
+                    return parseFloat((x || '0'), 10);
+                }
+                var getEffectiveHeight = function (el) {
+                    var style = getComputedStyle(el);
+
+                    return (parse(style.paddingTop) + 
+                            parse(style.paddingBottom) + parse(style.height));
+                }
 		
 		//First, get the content height
 		var tableHeight = Math.max(document.documentElement.clientHeight,
-									window.innerHeight || 0) 
-							- parseFloat(getComputedStyle(appBar).height, 10);
+					   (window.innerHeight || 0))
+				  - getEffectiveHeight(appBar);
 		
 		//Subtract the settings card height
-		tableHeight -= parseFloat(getComputedStyle(configCard).height, 10);
+		tableHeight -= getEffectiveHeight(configCard);
 		
 		//Subtract the contents of the data card (except the table height)
-		tableHeight -= parseFloat(getComputedStyle(tabBar).height, 10);
-		tableHeight -= parseFloat(getComputedStyle(head).height, 10);
-		tableHeight -= parseFloat(getComputedStyle(tools).height, 10);
+		tableHeight -= getEffectiveHeight(tabBar);
+		tableHeight -= getEffectiveHeight(head);
+		tableHeight -= getEffectiveHeight(tools);
 		
 		//Subtract whitespace
 		//Subtract vertical margins on the cards
-		tableHeight -= 4*parseFloat(getComputedStyle(dataCard).marginTop)
+                tableHeight -= (2 * parse(dataStyle.marginTop)
+                                + 2 * parse(dataStyle.marginBottom));
 		
 		//Subtract padding on main element
-		tableHeight -= 2*parseFloat(getComputedStyle(document.querySelector("main")).padding, 10);
-		
+                tableHeight -= (parse(mainStyle.paddingTop) + parse(mainStyle.paddingBottom));
+
 		body.style.height = tableHeight.toString() + "px";
 	},
 	_events: {

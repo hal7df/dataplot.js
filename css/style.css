@@ -41,14 +41,15 @@ body {
 #config {
 	padding: 0 10px;
 	overflow-y: auto;
+        vertical-align: middle;
 }
 .config-range {
 	width: 50px;
 }
 
 /** DATASETS AND FUNCTIONS **/
-#data-src-card > #data-table-contain {
-	flex: 0 1 65%;
+#data-src-card {
+    flex: 0 1 65%;
 }
 #data-src-card > .mdl-tabs {
 	flex: 1 1 auto;
