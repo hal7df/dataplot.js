@@ -16,12 +16,29 @@
  * limitations under the License.
  */
 
-function Equation (eqnStr) {
-	if (typeof eqnStr !== "string")
+function Equation (eqn) {
+	if (typeof eqn !== "string")
 		throw new TypeError ("Equation must be a string");
 	
-	//Split equation up by instances of addition/subtraction
-	var splitEqn = eqnStr.split(/[+-](?![^\(]*\))/);
+	eqn = eqn.replace(/([^$_]|^)(cos|sin|tan|ln|log|sqrt)/g,
+	                  function (match, p1, p2) {
+	   switch (p2) {
+	   case "sin":
+	   case "cos":
+	   case "tan":
+	   case "sqrt":
+	       return "Math." + p2;
+	   case "ln":
+	       return "Math.log";
+	   case "log":
+	       return "Math.log10";
+	   }
+	   
+	   return p2;
+	});
 	
-	
+	while (eqn.indexOf("^") >= 0) {
+	    eqn = eqn.replace(/([\d\w.]+|\(.+\))+\^([\d\w.]+|\(.+\))/g,
+	                      "Math.pow($1, $2)");
+	}
 }
