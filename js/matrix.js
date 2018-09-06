@@ -257,12 +257,12 @@ Matrix.copy = function (matrix) {
 	return clone;
 };
 Matrix.colFromArray = function (vec) {
-	colVec = new Matrix (vec.length, 1);
+	var colVec = new Matrix (vec.length, 1);
 	colVec.setCol(0, vec);
 	return colVec;
 };
 Matrix.rowFromArray = function (vec) {
-	rowVec = new Matrix (1, vec.length);
+	var rowVec = new Matrix (1, vec.length);
 	rowVec.setRow(0, vec);
 	return rowVec;
 };
