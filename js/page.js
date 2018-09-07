@@ -19,8 +19,8 @@
 var page = {
 	init: function () {
 		//Draw initial graph
-		this.readSaveData(document.getElementById("config"));
 		this._graph = new Graph (document.getElementById("graph"));
+		this.readSaveData(document.getElementById("config"));
 		this.redraw();
 		
 		//Populate list of point types
@@ -38,67 +38,92 @@ var page = {
 		this._graph.setXLabel(this._data.plot.xAxis.label);
 		this._graph.setYLabel(this._data.plot.yAxis.label);
 		this._graph.drawGraph();
-	},
-	readSaveData: function (inData) {
-		if (inData.nodeType) {			
-			this._data = {
-				plot: {
-					title: inData.elements.namedItem("graph-title").value,
-					xAxis: {
-						label: document.getElementById("x-name").textContent,
-						autoscale: inData.elements.namedItem("x-autoscale").checked,
-						min: parseFloat(inData.elements.namedItem("x-min").value, 10),
-						max: parseFloat(inData.elements.namedItem("x-max").value, 10)
-					},
-					yAxis: {
-						label: inData.elements.namedItem("graph-ylabel").value,
-						autoscale: inData.elements.namedItem("y-autoscale").checked,
-						min: parseFloat(inData.elements.namedItem("y-min").value, 10),
-						max: parseFloat(inData.elements.namedItem("y-max").value, 10)
-					}
-				},
-				data: {
-					x: [],
-					y: []
-				}
-			};
-		}
-		else {
-			this._data = inData;
-			this.redraw();
 
-			var config = document.getElementById("config").elements;
-			config.namedItem("graph-title").value = this._data.plot.title;
-			config.namedItem("graph-title").parentElement.classList.add("is-dirty");
-			document.getElementById("x-name").textContent = this._data.plot.xAxis.label;
-			config.namedItem("x-autoscale").checked = this._data.plot.xAxis.autoscale;
-			if (!this._data.plot.xAxis.autoscale) {
-				config.namedItem("x-min").value = this._data.plot.xAxis.min;
-				config.namedItem("x-min").parentElement.classList.add("is-dirty");
-				config.namedItem("x-max").value = this._data.plot.xAxis.max;
-				config.namedItem("x-max").parentElement.classList.add("is-dirty");
-			}
-			config.namedItem("graph-ylabel").value = this._data.plot.yAxis.label;
-			config.namedItem("graph-ylabel").parentElement.classList.add("is-dirty");
-			config.namedItem("y-autoscale").value = this._data.plot.yAxis.autoscale;
-			if (!this._data.plot.yAxis.autoscale) {
-				config.namedItem("y-min").value = this._data.plot.yAxis.min;
-				config.namedItem("y-min").parentElement.classList.add("is-dirty");
-				config.namedItem("y-max").value = this._data.plot.yAxis.max;
-				config.namedItem("y-min").parentElement.classList.add("is-dirty");
-			}
-		}
+                this._data.data.x.forEach(function (x, i) {
+                    if (x === null) return;
+
+                    this._data.data.y.forEach(function (set, j) {
+                        if (set[i] === null) return;
+
+                        this.plotPoint(x, set[i], (j % this._points.length),
+                                        this._getColor(j));
+                    }.bind(this));
+                }.bind(this));
+	},
+        plotPoint: function (x, y, type, color) {
+            var img = new Image();
+
+            img.onload = function () {
+                page._graph.plotImage(img, x, y);
+            };
+
+            img.src = this._getPoint(type, color);
+        },
+	readSaveData: function (inData) {
+            if (inData.nodeType) {			
+                this._data = {
+                    plot: {
+                        title: inData.elements.namedItem("graph-title").value,
+                        xAxis: {
+                            label: document.getElementById("x-name").textContent,
+                            autoscale: inData.elements.namedItem("x-autoscale").checked,
+                            min: parseFloat(inData.elements.namedItem("x-min").value, 10),
+                            max: parseFloat(inData.elements.namedItem("x-max").value, 10)
+                        },
+                        yAxis: {
+                            label: inData.elements.namedItem("graph-ylabel").value,
+                            autoscale: inData.elements.namedItem("y-autoscale").checked,
+                            min: parseFloat(inData.elements.namedItem("y-min").value, 10),
+                            max: parseFloat(inData.elements.namedItem("y-max").value, 10)
+                        }
+                    },
+                    data: {
+                        x: [],
+                        y: []
+                    }
+                };
+            }
+            else {
+                this._data = inData;
+                this.redraw();
+
+                var config = document.getElementById("config").elements;
+                config.namedItem("graph-title").value = this._data.plot.title;
+                config.namedItem("graph-title").parentElement.classList.add("is-dirty");
+                document.getElementById("x-name").textContent = this._data.plot.xAxis.label;
+                config.namedItem("x-autoscale").checked = this._data.plot.xAxis.autoscale;
+                if (!this._data.plot.xAxis.autoscale) {
+                    config.namedItem("x-min").value = this._data.plot.xAxis.min;
+                    config.namedItem("x-min").parentElement.classList.add("is-dirty");
+                    config.namedItem("x-max").value = this._data.plot.xAxis.max;
+                    config.namedItem("x-max").parentElement.classList.add("is-dirty");
+                }
+                config.namedItem("graph-ylabel").value = this._data.plot.yAxis.label;
+                config.namedItem("graph-ylabel").parentElement.classList.add("is-dirty");
+                config.namedItem("y-autoscale").value = this._data.plot.yAxis.autoscale;
+                if (!this._data.plot.yAxis.autoscale) {
+                    config.namedItem("y-min").value = this._data.plot.yAxis.min;
+                    config.namedItem("y-min").parentElement.classList.add("is-dirty");
+                    config.namedItem("y-max").value = this._data.plot.yAxis.max;
+                    config.namedItem("y-min").parentElement.classList.add("is-dirty");
+                }
+            }
+            this._graph.setTitle(this._data.plot.title);
+            this._graph.setXLabel(this._data.plot.xAxis.label);
+            this._graph.setYLabel(this._data.plot.yAxis.label);
+            this._graph.setXWindow(this._data.plot.xAxis.min, this._data.plot.xAxis.max);
+            this._graph.setYWindow(this._data.plot.yAxis.min, this._data.plot.yAxis.max);
 	},
 	settings: {
 		title: function (event) {
 			event = event || window.event;
 			page._graph.setTitle(page._data.plot.title = event.target.value);
-			page._graph.drawGraph();
+			page.redraw();
 		},
 		yLabel: function (event) {
 			event = event || window.event;
 			page._graph.setYLabel(page._data.plot.yAxis.label = event.target.value);
-			page._graph.drawGraph();
+			page.redraw();
 		},
 		changeBounds: function(event){
 			
@@ -118,7 +143,7 @@ var page = {
 			else if(event.target.id=="y-max"){
 				page._graph.setYWindow(page._data.plot.yAxis.min, page._data.plot.yAxis.max = parseFloat(event.target.value));
 			}
-			page._graph.drawGraph();
+			page.redraw();
 		},
 		autoscale: function (event) {
 			event = event || window.event
@@ -179,29 +204,41 @@ var page = {
 			var row = parseInt(event.target.parentElement.dataset.rownum, 10);
 			var data = page._data.data;
 			var dataNeeded = event.target.parentElement.dataset.needed;
+                        var isX = event.target.classList.contains('x');
+                        var setnum;
 			
-			if (event.target.classList.contains('x')) {
-				if (event.target.textContent.length > 0) {
-					data.x[row] = parseFloat(event.target.textContent, 10);
-					if (dataNeeded) dataNeeded = dataNeeded.replace("x","");
-				} else if (data.x[row] !== null || data.x[row] !== undefined)
-					data.x[row] = null;
-			} else {
-				var setnum = event.target.dataset.setnum;
-				if (data.y[setnum] === undefined) data.y[setnum] = [];
-				if (event.target.textContent.length > 0) {
-					data.y[setnum][row] = parseFloat(event.target.textContent, 10);
-					if (dataNeeded) dataNeeded = dataNeeded.replace("y","");
-				} else if (data.y[setnum][row] !== null || data.x[row] !== undefined)
-					data.y[setnum][row] = null;
-			}
-			
-			if (dataNeeded !== undefined && dataNeeded.length === 0) {
-				dataNeeded = undefined;
-				page.datasets.newRow(event.target.parentElement.parentElement);
-			}
-			
-			event.target.parentElement.dataset.needed = dataNeeded;
+                        //Update dataset and whether this row is still missing minimal data points
+                        if (isX) {
+                                if (event.target.textContent.length > 0) {
+                                        data.x[row] = parseFloat(event.target.textContent, 10);
+                                        if (dataNeeded) dataNeeded = dataNeeded.replace("x","");
+                                } else if (data.x[row] !== null || data.x[row] !== undefined) {
+                                        data.x[row] = null;
+                                }
+                        } else {
+                                setnum = event.target.dataset.setnum;
+                                if (data.y[setnum] === undefined) data.y[setnum] = [];
+                                if (event.target.textContent.length > 0) {
+                                        data.y[setnum][row] = parseFloat(event.target.textContent, 10);
+                                        if (dataNeeded) dataNeeded = dataNeeded.replace("y","");
+                                } else if (data.y[setnum][row] !== null || data.x[row] !== undefined) {
+                                        data.y[setnum][row] = null;
+                                }
+                        }
+                        
+                        if (dataNeeded === undefined || dataNeeded.length === 0) {
+                                if (dataNeeded !== undefined) {
+                                    dataNeeded = undefined;
+                                    page.datasets.newRow(event.target.parentElement.parentElement);
+                                }
+
+                                page.redraw();
+                        }
+
+                        if (dataNeeded)
+                            event.target.parentElement.dataset.needed = dataNeeded;
+                        else
+                            delete event.target.parentElement.dataset.needed;
 		},
 		newRow: function (table) {
 			var row = document.createElement("tr");
@@ -300,7 +337,29 @@ var page = {
 	_points: [],
 	_savePointType: function (index) {
 		return function (svg) { page._points[index] = svg; }
-	}
+	},
+        _getPoint: function (i, color) {
+            var svg = this._points[i].replace(/#000000/g, color);
+
+            return "data:image/svg+xml," + encodeURIComponent(svg);
+        },
+        _getColor: function (i) {
+            var MAX_CHANNEL = 256;
+            var r = MAX_CHANNEL - 1;
+            var g = 0;
+            var b = 0;
+            var rStr, gStr, bStr;
+
+            r = (r + (i * Math.floor(MAX_CHANNEL/this._points.length))) % MAX_CHANNEL;
+            g = (g - (i * Math.floor(MAX_CHANNEL/this._points.length))) % MAX_CHANNEL;
+            b = (b + (i * Math.floor(MAX_CHANNEL/this._points.length))) % MAX_CHANNEL;
+
+            rStr = (r <= 0xf ? '0' : "") + r.toString(16);
+            gStr = (g <= 0xf ? '0' : "") + g.toString(16);
+            bStr = (b <= 0xf ? '0' : "") + b.toString(16);
+
+            return '#' + rStr + gStr + bStr;
+        }
 };
 
 function ajaxGet (url, callback) {
