@@ -29,9 +29,9 @@ var page = {
 			ajaxGet("https://raw.githubusercontent.com/hal7df/dataplot.js/beta/img/pt-" + i + ".svg", this._savePointType(i));
 		}
 		
-		page.sizeTable();
+		page.sizeUI();
 		page._events.throttle("resize", "throttledResize");
-		window.addEventListener("resize", page.sizeTable);
+		window.addEventListener("resize", page.sizeUI);
 	},
 	redraw: function () {
 		this._graph.setTitle(this._data.plot.title);
@@ -59,6 +59,54 @@ var page = {
 
             img.src = this._getPoint(type, color);
         },
+        computeAutoscale: function () {
+            var _comp = function (plot, data) {
+                if (!plot.autoscale) return;
+
+                if (data.length == 0) {
+                    plot.min = -10;
+                    plot.max = 10;
+                    return;
+                }
+
+                var getVisibleRange = function (min, max) {
+                    var d = max - min;
+                    var h = 10;
+
+                    if ((d - 0) > (Number.EPSILON*8))
+                        h = ((d/0.9) - d)/2;
+
+                    return {
+                        min: (min - h),
+                        max: (max + h)
+                    };
+                }
+
+                if (typeof(data[0]) === "number") {
+                    var rng = getVisibleRange(data.reduce(function (min, cur) {
+                        return Math.min(min, cur);
+                    }, Number.POSITIVE_INFINITY), data.reduce(function (max, cur) {
+                        return Math.max(max, cur);
+                    }, Number.NEGATIVE_INFINITY));
+                } else {
+                    var rng = getVisibleRange(data.reduce(function (min, curArr) {
+                        return curArr.reduce(function (lMin, cur) {
+                            return Math.min(lMin, cur);
+                        }, min);
+                    }, Number.POSITIVE_INFINITY), data.reduce(function (max, curArr) {
+                        return curArr.reduce(function (lMax, cur) {
+                            return Math.max(lMax, cur);
+                        }, max);
+                    }, Number.NEGATIVE_INFINITY));
+                }
+                
+                plot.min = rng.min;
+                plot.max = rng.max;
+            };
+
+            _comp(this._data.plot.xAxis, this._data.data.x);
+            _comp(this._data.plot.yAxis, this._data.data.y);
+        },
 	readSaveData: function (inData) {
             if (inData.nodeType) {			
                 this._data = {
@@ -85,7 +133,6 @@ var page = {
             }
             else {
                 this._data = inData;
-                this.redraw();
 
                 var config = document.getElementById("config").elements;
                 config.namedItem("graph-title").value = this._data.plot.title;
@@ -108,6 +155,7 @@ var page = {
                     config.namedItem("y-min").parentElement.classList.add("is-dirty");
                 }
             }
+            this.computeAutoscale();
             this._graph.setTitle(this._data.plot.title);
             this._graph.setXLabel(this._data.plot.xAxis.label);
             this._graph.setYLabel(this._data.plot.yAxis.label);
@@ -146,23 +194,28 @@ var page = {
 			page.redraw();
 		},
 		autoscale: function (event) {
-			event = event || window.event
-			var min = event.target.parentElement.nextElementSibling;
-			var max = min.nextElementSibling;
-			var axis = page._data.plot[event.target.id.split('-')[0] === 'x' ? "xAxis" : "yAxis"];
-			
-			if (event.target.checked) {
-			    min.MaterialTextfield.disable();
-			    max.MaterialTextfield.disable();
-			    
-                min.MaterialTextfield.change("");
-                max.MaterialTextfield.change("");
-            
-                //TODO: Run graph autoscale logic
-			} else {
-			    min.MaterialTextfield.enable();
-			    max.MaterialTextfield.enable();
-			}
+                    event = event || window.event
+                    var min = event.target.parentElement.nextElementSibling;
+                    var max = min.nextElementSibling;
+                    var axis = page._data.plot[event.target.id.split('-')[0] === 'x' ? "xAxis" : "yAxis"];
+                    
+                    if (event.target.checked) {
+                        min.MaterialTextfield.disable();
+                        max.MaterialTextfield.disable();
+                        
+                        min.MaterialTextfield.change("");
+                        max.MaterialTextfield.change("");
+        
+                        page.computeAutoscale();
+                        page._graph.setXWindow(page._data.plot.xAxis.min,
+                                               page._data.plot.xAxis.max);
+                        page._graph.setYWindow(page._data.plot.yAxis.min,
+                                               page._data.plot.yAxis.max);
+                        page.redraw();
+                    } else {
+                        min.MaterialTextfield.enable();
+                        max.MaterialTextfield.enable();
+                    }
 		}
 	},
 	datasets: {
@@ -231,7 +284,12 @@ var page = {
                                     dataNeeded = undefined;
                                     page.datasets.newRow(event.target.parentElement.parentElement);
                                 }
-
+                                
+                                page.computeAutoscale();
+                                page._graph.setXWindow(page._data.plot.xAxis.min,
+                                                       page._data.plot.xAxis.max);
+                                page._graph.setYWindow(page._data.plot.yAxis.min,
+                                                       page._data.plot.yAxis.max);
                                 page.redraw();
                         }
 
@@ -264,7 +322,7 @@ var page = {
 			table.appendChild(row);
 		}
 	},
-	sizeTable: function () {
+	sizeUI: function () {
 		var appBar = document.querySelector("header");
 		var configArea = document.getElementById("data-config-contain");
 		var configCard = configArea.firstElementChild;
@@ -276,6 +334,10 @@ var page = {
 		var head = table.firstElementChild;
 		var body = table.lastElementChild;
                 var dataStyle = getComputedStyle(dataCard);
+                var graphCard = configArea.nextElementSibling;
+                var canvas = graphCard.firstElementChild;
+                var canvasTools = graphCard.lastElementChild;
+                var graphStyle = getComputedStyle(graphCard);
                 var mainStyle = getComputedStyle(document.querySelector("main"));
                 var parse = function (x) {
                     return parseFloat((x || '0'), 10);
@@ -309,6 +371,18 @@ var page = {
                 tableHeight -= (parse(mainStyle.paddingTop) + parse(mainStyle.paddingBottom));
 
 		body.style.height = tableHeight.toString() + "px";
+
+                //Now size the height of the graph
+                var graphHeight = Math.max(document.documentElement.clientHeight,
+                                            (window.innerHeight || 0))
+                                    - getEffectiveHeight(appBar);
+                graphHeight -= getEffectiveHeight(canvasTools);
+                graphHeight -= (parse(graphStyle.marginTop) +
+                                parse(graphStyle.marginBottom));
+
+                canvas.style.height = graphHeight.toString() + "px";
+                page._graph.updateSize();
+                page.redraw();
 	},
 	_events: {
 		getCustom: function (name, params) {
