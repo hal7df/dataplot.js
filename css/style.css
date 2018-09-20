@@ -50,6 +50,7 @@ body {
 /** DATASETS AND FUNCTIONS **/
 #data-src-card {
     flex: 0 1 65%;
+    overflow: visible; /* Allows tooltips to roll outside in Chrome */
 }
 #data-src-card > .mdl-tabs {
 	flex: 1 1 auto;
@@ -97,6 +98,10 @@ body {
 }
 
 /** GRAPH CARD **/
+
+#graph-contain {
+    overflow: visible; /* Allows tooltips to roll outside in Chrome */
+}
 
 #graph-contain > #graph {
 	width: 100%;
