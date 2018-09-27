@@ -59,54 +59,6 @@ var page = {
 
             img.src = this._getPoint(type, color);
         },
-        computeAutoscale: function () {
-            var _comp = function (plot, data) {
-                if (!plot.autoscale) return;
-
-                if (data.length == 0) {
-                    plot.min = -10;
-                    plot.max = 10;
-                    return;
-                }
-
-                var getVisibleRange = function (min, max) {
-                    var d = max - min;
-                    var h = 10;
-
-                    if ((d - 0) > (Number.EPSILON*8))
-                        h = ((d/0.9) - d)/2;
-
-                    return {
-                        min: (min - h),
-                        max: (max + h)
-                    };
-                }
-
-                if (typeof(data[0]) === "number") {
-                    var rng = getVisibleRange(data.reduce(function (min, cur) {
-                        return Math.min(min, cur);
-                    }, Number.POSITIVE_INFINITY), data.reduce(function (max, cur) {
-                        return Math.max(max, cur);
-                    }, Number.NEGATIVE_INFINITY));
-                } else {
-                    var rng = getVisibleRange(data.reduce(function (min, curArr) {
-                        return curArr.reduce(function (lMin, cur) {
-                            return Math.min(lMin, cur);
-                        }, min);
-                    }, Number.POSITIVE_INFINITY), data.reduce(function (max, curArr) {
-                        return curArr.reduce(function (lMax, cur) {
-                            return Math.max(lMax, cur);
-                        }, max);
-                    }, Number.NEGATIVE_INFINITY));
-                }
-                
-                plot.min = rng.min;
-                plot.max = rng.max;
-            };
-
-            _comp(this._data.plot.xAxis, this._data.data.x);
-            _comp(this._data.plot.yAxis, this._data.data.y);
-        },
 	readSaveData: function (inData) {
             if (inData.nodeType) {			
                 this._data = {
@@ -130,6 +82,14 @@ var page = {
                         y: []
                     }
                 };
+
+                var axisDefault = function (axis) {
+                    if (isNaN(axis.min)) axis.min = -10;
+                    if (isNaN(axis.max)) axis.max = 10;
+                };
+
+                axisDefault(this._data.plot.xAxis);
+                axisDefault(this._data.plot.yAxis);
             }
             else {
                 this._data = inData;
@@ -155,7 +115,7 @@ var page = {
                     config.namedItem("y-min").parentElement.classList.add("is-dirty");
                 }
             }
-            this.computeAutoscale();
+            
             this._graph.setTitle(this._data.plot.title);
             this._graph.setXLabel(this._data.plot.xAxis.label);
             this._graph.setYLabel(this._data.plot.yAxis.label);
@@ -197,20 +157,20 @@ var page = {
                     event = event || window.event
                     var min = event.target.parentElement.nextElementSibling;
                     var max = min.nextElementSibling;
-                    var axis = page._data.plot[event.target.id.split('-')[0] === 'x' ? "xAxis" : "yAxis"];
-                    
-                    if (event.target.checked) {
+                    var axisStr = event.currentTarget.id.split("-")[0];
+                    var win;
+                    var axis = page._data.plot[axisStr === 'x' ? "xAxis" : "yAxis"];
+                   
+                    axis.autoscale = event.currentTarget.checked;
+
+                    if (event.currentTarget.checked) {
                         min.MaterialTextfield.disable();
                         max.MaterialTextfield.disable();
                         
                         min.MaterialTextfield.change("");
                         max.MaterialTextfield.change("");
-        
-                        page.computeAutoscale();
-                        page._graph.setXWindow(page._data.plot.xAxis.min,
-                                               page._data.plot.xAxis.max);
-                        page._graph.setYWindow(page._data.plot.yAxis.min,
-                                               page._data.plot.yAxis.max);
+       
+                        page._doAutoscale();
                         page.redraw();
                     } else {
                         min.MaterialTextfield.enable();
@@ -285,11 +245,7 @@ var page = {
                                     page.datasets.newRow(event.target.parentElement.parentElement);
                                 }
                                 
-                                page.computeAutoscale();
-                                page._graph.setXWindow(page._data.plot.xAxis.min,
-                                                       page._data.plot.xAxis.max);
-                                page._graph.setYWindow(page._data.plot.yAxis.min,
-                                                       page._data.plot.yAxis.max);
+                                page._doAutoscale();
                                 page.redraw();
                         }
 
@@ -408,6 +364,25 @@ var page = {
 			target.addEventListener(sourceEvent, intermediateListener);
 		}
 	},
+        _doAutoscale: function () {
+            var win;
+
+            if (this._data.plot.xAxis.autoscale) {
+                this._graph.autoscaleX(this._data.data.x);
+
+                win = this._graph.getXWindow();
+                this._data.plot.xAxis.min = win.min;
+                this._data.plot.xAxis.max = win.max;
+            }
+
+            if (this._data.plot.yAxis.autoscale) {
+                this._graph.autoscaleY(this._data.data.y);
+
+                win = this._graph.getYWindow();
+                this._data.plot.yAxis.min = win.min;
+                this._data.plot.yAxis.max = win.max;
+            }
+        },
 	_points: [],
 	_savePointType: function (index) {
 		return function (svg) { page._points[index] = svg; }
