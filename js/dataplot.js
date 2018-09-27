@@ -240,7 +240,8 @@ function Graph (canvas) {
         m_ctx.textBaseline = "top";
         for (var x = m_window.x.min; x <= m_window.x.max;
              x += m_window.x.interval) {
-            if (x > m_window.x.min && x < m_window.x.max) {
+            if (x > m_window.x.min &&
+                x < (m_window.x.max - (m_window.x.interval/50))) {
                 m_ctx.beginPath();
                 m_ctx.moveTo(x_(x), y_(m_window.y.min));
                 m_ctx.lineTo(x_(x), y_(m_window.y.max));
@@ -255,7 +256,8 @@ function Graph (canvas) {
         m_ctx.textBaseline = "middle";
         m_ctx.textAlign = "right";
         for (var y = m_window.y.min; y <= m_window.y.max; y += m_window.y.interval) {
-            if (y > m_window.y.min && y < m_window.y.max) {
+            if (y > m_window.y.min &&
+                y < m_window.y.max - (m_window.y.interval/50)) {
                 m_ctx.beginPath();
                 m_ctx.moveTo(x_(m_window.x.min), y_(y));
                 m_ctx.lineTo(x_(m_window.x.max), y_(y));
